@@ -55,38 +55,18 @@ def ship_input(ship_size):
     input_checker = False
     good_cords_letter = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9}
     good_cords_number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    good_cords_number_string = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    good_cords_number_string = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
     while input_checker is False:
         full_input = get_coord_input(ship_size)
         check_quit(''.join(full_input))
         if len(full_input) == 3:
-            if full_input[0] in good_cords_letter.keys():
-                if full_input[1] == "1":
-                    if full_input[2] == "0":
-                        row = full_input[0]
-                        col = 9
-                        if row in good_cords_letter.keys() and col in good_cords_number:
-                            for r, v in good_cords_letter.items():
-                                if row == r:
-                                    row = v
-                                    return row, col
-                        else:
-                            print("Wrong coordinates!1")
-                            input_checker = False
-                    else:
-                        print("Wrong coordinates!2")
-                        input_checker = False
-                else:
-                    print("Wrong coordinates!3")
-                    input_checker = False
-            else:
-                print("Wrong coordinates!4")
-                input_checker = False
+            full_input.remove(full_input[1])
         if len(full_input) == 2:
             if full_input[0] in good_cords_letter.keys():
                 if full_input[1] in good_cords_number_string:
                     row = full_input[0]
-                    col = int(full_input[1])-1
+                    col = int(full_input[1]) - 1
+                    col = 9 if col == -1 else col
                     if row in good_cords_letter.keys() and col in good_cords_number:
                         for r, v in good_cords_letter.items():
                             if row == r:
@@ -131,37 +111,14 @@ def size_two_ship_orient(ship_coordinates, board_size):
         check_quit(ship_orientation)
         if ship_orientation.isalpha():
             if len(ship_orientation) == 1:
-                if ship_orientation == "N":
-                    if ship_coordinates[0] == 0:
-                        good_coords_and_orientation = False
-                        print("You can't place the ship here!")
-                    else:
-                        orient = ship_coordinates, ((ship_coordinates[0]) - 1, ship_coordinates[1])
-                        return orient
-                if ship_orientation == "W":
-                    if ship_coordinates[1] == board_size - 1:
-                        good_coords_and_orientation = False
-                        print("You can't place the ship here!")
-                    else:
-                        orient = ship_coordinates, (ship_coordinates[0], (ship_coordinates[1]) + 1)
-                        print(orient)
-                        return orient
-                if ship_orientation == "S":
-                    if ship_coordinates[0] == board_size - 1:
-                        good_coords_and_orientation = False
-                        print("You can't place the ship here!")
-                    else:
-                        orient = ship_coordinates, ((ship_coordinates[0]) + 1, ship_coordinates[1])
-                        print(orient)
-                        return orient
-                if ship_orientation == "E":
-                    if ship_coordinates[1] == 0:
-                        good_coords_and_orientation = False
-                        print("You can't place the ship here!")
-                    else:
-                        orient = ship_coordinates, (ship_coordinates[0], (ship_coordinates[1]) - 1)
-                        print(orient)
-                        return orient
+                ship_orientation_var_x = -1 if ship_orientation == "N" else 1 if ship_orientation == "S" else 0
+                ship_orientation_var_y = -1 if ship_orientation == "E" else 1 if ship_orientation == "W" else 0
+                if ship_coordinates[0] == 0 and ship_orientation_var_x != 0 or ship_coordinates[1] == board_size - 1 and ship_orientation_var_y != 0:
+                    good_coords_and_orientation = False
+                    print("You can't place the ship here!")
+                else:
+                    orient = ship_coordinates, ((ship_coordinates[0]) + ship_orientation_var_x, ship_coordinates[1] + ship_orientation_var_y)
+                    return orient
             else:
                 good_coords_and_orientation = False
                 print("Not a valid input!")
@@ -175,16 +132,18 @@ def init_board(board_size):
 
 
 def print_board(board, board_size):
+    print_var = ''
     header = ' '
     for index in range(board_size):
         header += f' {index+1}'
-    print(header)
+    print_var += header + "\n"
     for row_index, row in enumerate(board):
         line = f"{list(string.ascii_uppercase)[row_index]} "
         for element in row:
             line += element + ' '
         line = line[0:-1]
-        print(line)
+        print_var += line + "\n"
+    return print_var
 
 
 def ship_placement(board, board_size):
@@ -208,26 +167,31 @@ def battleship_game(board, board_size, size_one_ship_coordinates, size_two_ship_
 
 
 def get_player_boards(player, board, board_size):
+    print_var = ''
     if player == "1":
-        print_board(board, board_size)
-        ship_placement(board, board_size)
+        print_var = print_board(board, board_size)
     if player == "2":
-        print_board(board, board_size)
-        ship_placement(board, board_size)
+        print_var = print_board(board, board_size) 
+    return print_var
 
 
 def main():
-    intro()
-    animated_logo_print()
+    # intro()
+    # animated_logo_print()
     board_size = valid_board_size_input()
     board1 = init_board(board_size)
     board2 = init_board(board_size)
-    player = "1"
-    board = board1
-    get_player_boards(player, board, board_size)
-    player = "2"
-    board = board2
-    get_player_boards(player, board, board_size)
+    get_player_1_list = get_player_boards('1', board1, board_size).splitlines()
+    get_player_2_list = get_player_boards('2', board2, board_size).splitlines()
+    board_size_spaces = ((board_size * 2) - 14)
+    board_size_spaces = 1 if board_size_spaces <= 0 else board_size_spaces
+    print('\n{2:{3}}{0:30}{1}\n'.format("Player1 board:", "Player2 board:", ' ', board_size_spaces))
+    board_size_meter = (14 - ((board_size * 2) + 1)) / 2
+    board_size_meter = 1 if board_size_meter <= 0 else board_size_meter
+    for i in range(len(get_player_1_list)):
+        print('{2:{3}}{0:30}{1}'.format(get_player_1_list[i], get_player_2_list[i], ' ', board_size_meter))
+    print()
+    ship_placement(board1, board_size)
 
 
 if __name__ == "__main__":
