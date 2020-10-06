@@ -156,29 +156,64 @@ def print_board(board, board_size):
         print(line)
 
 
-def battleship_game():
+def ship_placement(board, board_size):
     ship_size = 1
     size_one_ship_coordinates = ship_input(ship_size)
+    print(size_one_ship_coordinates)
     ship_size += 1
-    size_two_ship_coordinates = ship_input(ship_size)
-    ship_orientation = size_two_ship_orient(size_two_ship_coordinates, board_size)
-    hit_checker(ship_placement)
+    size_two_ship_start_coordinates = ship_input(ship_size)
+    print(size_two_ship_start_coordinates)
+    size_two_ship_full_coordinates = size_two_ship_orient(size_two_ship_start_coordinates, board_size)
+    battleship_game(board, board_size, size_one_ship_coordinates, size_two_ship_full_coordinates)
 
 
-def hit_checker():
-    pass
+def mark_ship(size_one_ship_coordinates, size_two_ship_full_coordinates, board_size):
+    row = size_one_ship_coordinates[0]
+    col = size_one_ship_coordinates[1]
+
+
+def battleship_game(board, board_size, size_one_ship_coordinates, size_two_ship_full_coordinates):
+    print("akurvanyad")
+
+
+def get_player_boards(player, board, board_size):
+    if player == "1":
+        print_board(board, board_size)
+        ship_placement(board, board_size)
+    if player == "2":
+        print_board(board, board_size)
+        ship_placement(board, board_size)
 
 
 def main():
+
     print(
         '''
-██████   █████  ████████ ████████ ██      ███████ ███████ ██   ██ ██ ██████
+██████   █████  ████████ ████████ ██      ███████ ███████ ██   ██ ██ ██████    
 ██   ██ ██   ██    ██       ██    ██      ██      ██      ██   ██ ██ ██   ██ 
 ██████  ███████    ██       ██    ██      █████   ███████ ███████ ██ ██████  
 ██   ██ ██   ██    ██       ██    ██      ██           ██ ██   ██ ██ ██
 ██████  ██   ██    ██       ██    ███████ ███████ ███████ ██   ██ ██ ██
-
-                     
+                    ()
+                    ||q',,'
+                    ||d,~
+         (,---------------------,)
+          ',       q888p       ,'
+            \       986       /
+             \  8p, d8b ,q8  /
+              ) 888a888a888 (
+             /  8b` q8p `d8  \              O
+            /       689       \             |','
+           /       d888b       \      (,---------,)
+         ,'_____________________',     \   ,8,   /
+         (`__________L|_________`)      ) a888a (    _,_
+         [___________|___________]     /___`8`___\   }*{
+           }:::|:::::}::|::::::{      (,=========,)  -=-
+   tchnrbi  '|::::}::|:::::{:|'  .,.    \:::|:::/    ~`~=
+ --=~(@)~=-- '|}:::::|::{:::|'          ~".,."~`~
+               '|:}::|::::|'~`~".,."
+           ~`~".,."~`~".,                 "~`~".,."~
+                          ".,."~`~              
    __       _   _________  ___  ____  ____  ____  ___  __  _________  __
   / / __ __(_) / ___/ __ \/ _ \/ __/ / __ \/ __/ / _ \/ / / /_  __\ \/ /
  / _ / // _   / /__/ /_/ / // / _/  / /_/ / _/  / // / /_/ / / /   \  /
@@ -186,9 +221,14 @@ def main():
     /___/        ''')
 
     board_size = valid_board_size_input()
-    board = init_board(board_size)
-    print_board(board, board_size)
-    battleship_game()
+    board1 = init_board(board_size)
+    board2 = init_board(board_size)
+    player = "1"
+    board = board1
+    get_player_boards(player, board, board_size)
+    player = "2"
+    board = board2
+    get_player_boards(player, board, board_size)
 
 
 if __name__ == "__main__":
