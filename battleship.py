@@ -1,8 +1,6 @@
 import sys
 import string
 
-from numpy.core.numeric import full
-
 
 def check_quit(input):
     if input == 'QUIT':
@@ -11,75 +9,135 @@ def check_quit(input):
         return
 
 
-def ship_input():
+def get_coord_input(ship_size):
+    if ship_size == 1:
+        size_one_ship_coord = list(input("Please select a starting coordinate for your small(1) ship (for example A1): ").upper())
+        check_quit(''.join(size_one_ship_coord))
+        return size_one_ship_coord
+    if ship_size == 2:
+        size_two_ship_coord = list(input("Please select a starting coordinate for your medium(2) ship (for example A1): ").upper())
+        check_quit(''.join(size_two_ship_coord))
+        return size_two_ship_coord
+
+
+def ship_input(ship_size):
     input_checker = False
     good_cords_letter = {'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9}
     good_cords_number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    good_cords_number_string = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     while input_checker is False:
-        full_input = list(input("Please select a row and a column (for example A1): ").upper())
+        full_input = get_coord_input(ship_size)
         check_quit(''.join(full_input))
-        if len(full_input) == 2:
-            for key, value in good_cords_letter.items():
-                if full_input[0] == key:
-                    if int(full_input[1]) in good_cords_number:
+        if len(full_input) == 3:
+            if full_input[0] in good_cords_letter.keys():
+                if full_input[1] == "1":
+                    if full_input[2] == "0":
                         row = full_input[0]
-                        col = int(full_input[1])-1
+                        col = 9
                         if row in good_cords_letter.keys() and col in good_cords_number:
                             for r, v in good_cords_letter.items():
                                 if row == r:
                                     row = v
                                     return row, col
-                                # else:
-                                #     print("anyád3")
-                                #     print("Coordinates is used! Choose another coordinate!")
-                                #     input_checker = False
                         else:
-                            print("Wrong coordinates!")
+                            print("Wrong coordinates!1")
                             input_checker = False
+                    else:
+                        print("Wrong coordinates!2")
+                        input_checker = False
+                else:
+                    print("Wrong coordinates!3")
+                    input_checker = False
+            else:
+                print("Wrong coordinates!4")
+                input_checker = False
+        if len(full_input) == 2:
+            if full_input[0] in good_cords_letter.keys():
+                if full_input[1] in good_cords_number_string:
+                    row = full_input[0]
+                    col = int(full_input[1])-1
+                    if row in good_cords_letter.keys() and col in good_cords_number:
+                        for r, v in good_cords_letter.items():
+                            if row == r:
+                                row = v
+                                return row, col
+                    else:
+                        print("Wrong coordinates!")
+                        input_checker = False
+                else:
+                    print("Wrong coordinates!")
+                    input_checker = False
+            else:
+                print("Wrong coordinates!")
+                input_checker = False
         else:
             print("Wrong coordinates!")
             input_checker = False
- 
+
 
 def valid_board_size_input():
     input_is_valid = True
     while input_is_valid:
         valid_input_numbers = list(range(5, 11))
-        board_size = int(input("What size you want for the board? "))
-        if board_size in valid_input_numbers:
-            return board_size
+        board_size = input("What board size do you want? ")
+        check_quit(board_size)
+        if board_size.isdigit():
+            board_size = int(board_size)
+            if board_size in valid_input_numbers:
+                return board_size
+            else:
+                print("Not a valid input! Please input a number from 5 to 10 ")
+                input_is_valid = True
         else:
-            print("Not a valid input! Please input a number from 5 to 10 ") 
+            print("Not a valid input! Please input a number from 5 to 10 ")
             input_is_valid = True
 
 
-def size_two_ship_orient(ship_coordinates):
+def size_two_ship_orient(ship_coordinates, board_size):
     good_coords_and_orientation = False
     while good_coords_and_orientation is False:
-        ship_orientation = input("Please input the orientation of the ship: ((N)orth/(W)est/(S)outh/(E)ast ").lower()
-        if ship_orientation == "n":
-            if ship_coordinates[0] == 0:
-                good_coords_and_orientation = False
-                print("You can't place the ship here!")
+        ship_orientation = input("Please input the orientation of the ship: ((N)orth/(W)est/(S)outh/(E)ast ").upper()
+        check_quit(ship_orientation)
+        if ship_orientation.isalpha():
+            if len(ship_orientation) == 1:
+                if ship_orientation == "N":
+                    if ship_coordinates[0] == 0:
+                        good_coords_and_orientation = False
+                        print("You can't place the ship here!")
+                    else:
+                        orient = ship_coordinates, ((ship_coordinates[0]) - 1, ship_coordinates[1])
+                        return orient
+                if ship_orientation == "W":
+                    if ship_coordinates[1] == board_size - 1:
+                        good_coords_and_orientation = False
+                        print("You can't place the ship here!")
+                    else:
+                        orient = ship_coordinates, (ship_coordinates[0], (ship_coordinates[1]) + 1)
+                        print(orient)
+                        return orient
+                if ship_orientation == "S":
+                    if ship_coordinates[0] == board_size - 1:
+                        good_coords_and_orientation = False
+                        print("You can't place the ship here!")
+                    else:
+                        orient = ship_coordinates, ((ship_coordinates[0]) + 1, ship_coordinates[1])
+                        print(orient)
+                        return orient
+                if ship_orientation == "E":
+                    if ship_coordinates[1] == 0:
+                        good_coords_and_orientation = False
+                        print("You can't place the ship here!")
+                    else:
+                        orient = ship_coordinates, (ship_coordinates[0], (ship_coordinates[1]) - 1)
+                        print(orient)
+                        return orient
             else:
-                orient = ship_coordinates, ((ship_coordinates[0]) - 1 , ship_coordinates[1])
-                return orient
-        if ship_orientation == "w":
-            pass
-        if ship_orientation == "s":
-            pass
-        if ship_orientation == "e":
-            pass
+                good_coords_and_orientation = False
+                print("Not a valid input!")
+        else:
+            good_coords_and_orientation = False
+            print("Not a valid input!")
 
-    # return starting coordinates, and orientation
-    pass
-
-
-def ship_place(ship_orient):
-    little_ship = []
-    medium_ship = []
-    pass
- 
 
 def init_board(board_size):
     return [['O' for _ in range(board_size)] for _ in range(board_size)]
@@ -98,18 +156,39 @@ def print_board(board, board_size):
         print(line)
 
 
+def battleship_game():
+    ship_size = 1
+    size_one_ship_coordinates = ship_input(ship_size)
+    ship_size += 1
+    size_two_ship_coordinates = ship_input(ship_size)
+    ship_orientation = size_two_ship_orient(size_two_ship_coordinates, board_size)
+    hit_checker(ship_placement)
+
+
 def hit_checker():
     pass
 
 
 def main():
+    print(
+        '''
+██████   █████  ████████ ████████ ██      ███████ ███████ ██   ██ ██ ██████
+██   ██ ██   ██    ██       ██    ██      ██      ██      ██   ██ ██ ██   ██ 
+██████  ███████    ██       ██    ██      █████   ███████ ███████ ██ ██████  
+██   ██ ██   ██    ██       ██    ██      ██           ██ ██   ██ ██ ██
+██████  ██   ██    ██       ██    ███████ ███████ ███████ ██   ██ ██ ██
+
+                     
+   __       _   _________  ___  ____  ____  ____  ___  __  _________  __
+  / / __ __(_) / ___/ __ \/ _ \/ __/ / __ \/ __/ / _ \/ / / /_  __\ \/ /
+ / _ / // _   / /__/ /_/ / // / _/  / /_/ / _/  / // / /_/ / / /   \  /
+/_.__\_, (_)  \___/\____/____/___/  \____/_/   /____/\____/ /_/    /_/
+    /___/        ''')
+
     board_size = valid_board_size_input()
     board = init_board(board_size)
     print_board(board, board_size)
-    ship_coordinates = ship_input()
-    ship_orientation = size_two_ship_orient(ship_coordinates)
-    ship_placement = ship_place(ship_orientation)
-    hit_checker(ship_placement)
+    battleship_game()
 
 
 if __name__ == "__main__":
