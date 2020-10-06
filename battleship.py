@@ -1,5 +1,36 @@
 import sys
+import time
 import string
+import os
+
+
+sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=800, cols=800))
+
+
+def intro():
+    print("Loading:")
+
+    animation = ["[■□□□□□□□□□]","[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
+
+    for i in range(len(animation)):
+        time.sleep(0.4)
+        sys.stdout.write("\r" + animation[i % len(animation)])
+        sys.stdout.flush()
+
+
+def animated_logo_print():
+    filenames = ["logo.txt", "logo2.txt"]
+    frames = []
+
+    for name in filenames:
+        with open(name, "r", encoding="utf8") as f:
+            frames.append(f.readlines())
+
+    for _ in range(10):
+        for frame in frames:
+            print("".join(frame))
+            time.sleep(0.4)
+            os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def check_quit(input):
@@ -186,40 +217,8 @@ def get_player_boards(player, board, board_size):
 
 
 def main():
-
-    print(
-        '''
-██████   █████  ████████ ████████ ██      ███████ ███████ ██   ██ ██ ██████    
-██   ██ ██   ██    ██       ██    ██      ██      ██      ██   ██ ██ ██   ██ 
-██████  ███████    ██       ██    ██      █████   ███████ ███████ ██ ██████  
-██   ██ ██   ██    ██       ██    ██      ██           ██ ██   ██ ██ ██
-██████  ██   ██    ██       ██    ███████ ███████ ███████ ██   ██ ██ ██
-                    ()
-                    ||q',,'
-                    ||d,~
-         (,---------------------,)
-          ',       q888p       ,'
-            \       986       /
-             \  8p, d8b ,q8  /
-              ) 888a888a888 (
-             /  8b` q8p `d8  \              O
-            /       689       \             |','
-           /       d888b       \      (,---------,)
-         ,'_____________________',     \   ,8,   /
-         (`__________L|_________`)      ) a888a (    _,_
-         [___________|___________]     /___`8`___\   }*{
-           }:::|:::::}::|::::::{      (,=========,)  -=-
-   tchnrbi  '|::::}::|:::::{:|'  .,.    \:::|:::/    ~`~=
- --=~(@)~=-- '|}:::::|::{:::|'          ~".,."~`~
-               '|:}::|::::|'~`~".,."
-           ~`~".,."~`~".,                 "~`~".,."~
-                          ".,."~`~              
-   __       _   _________  ___  ____  ____  ____  ___  __  _________  __
-  / / __ __(_) / ___/ __ \/ _ \/ __/ / __ \/ __/ / _ \/ / / /_  __\ \/ /
- / _ / // _   / /__/ /_/ / // / _/  / /_/ / _/  / // / /_/ / / /   \  /
-/_.__\_, (_)  \___/\____/____/___/  \____/_/   /____/\____/ /_/    /_/
-    /___/        ''')
-
+    intro()
+    animated_logo_print()
     board_size = valid_board_size_input()
     board1 = init_board(board_size)
     board2 = init_board(board_size)
