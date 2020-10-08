@@ -30,10 +30,10 @@ def animated_logo_print():
         with open(name, "r", encoding="utf8") as f:
             frames.append(f.readlines())
 
-    for _ in range(10):
+    for _ in range(6):
         for frame in frames:
             print("".join(frame))
-            time.sleep(0.4)
+            time.sleep(0.3)
             os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -57,6 +57,7 @@ def get_coord_input(ship_size):
 
 def get_shoot_coord_input():
     shoot_enemy_coord = list(input("Please select a coordinate to shoot your enemy(for example A1): \n").upper())
+    print()
     check_quit(''.join(shoot_enemy_coord))
     return shoot_enemy_coord
 
@@ -209,23 +210,31 @@ def battleship_game_player_rotation(board1, board2, board_size, player_1_ship_li
     player = '1'
     player_1_miss = []
     player_2_miss = []
+    player_1_ship_list_copy = []
+    player_2_ship_list_copy = []
     win_checker = True
+    player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2 = all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list)
     while win_checker is True:
-        if player == '1':
-            reset = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss)
-            double_board_print_logic(board1, board2, board_size)
-            if reset:
-                win_checker = True
-            else:
-                player = '1' if player == '2' else '2'
-        elif player == '2':
-            reset = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss)
-            double_board_print_logic(board1, board2, board_size)
-            if reset:
-                win_checker = True
-            else:
-                player = '1' if player == '2' else '2'
+        reset = hit_checker(game_phase, ship_size, player, player_1_miss, player_2_miss, player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2, player_1_ship_list_copy, player_2_ship_list_copy)
+        if reset != 'skip':
+            os.system('cls' if os.name == 'nt' else 'clear')
+        double_board_print_logic(board1, board2, board_size)
+        if reset == True:
+            win_checker = False
+        elif reset == 'skip':
+            win_checker = True
+        else:
+            player = '1' if player == '2' else '2'
 
+
+def new_game():
+    while True:
+        new_game = input("Do you want to play Battleship again?(Y/N)").upper()
+        if new_game == 'Y':
+            return True
+        elif new_game == 'N':
+            return False
+    
 
 def all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list):
     player_2_ship_2 = []
@@ -239,24 +248,31 @@ def all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list):
     return player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2
 
 
-def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss):
-    player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2 = all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list)
+def hit_checker(game_phase, ship_size, player, player_1_miss, player_2_miss, player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2, player_1_ship_list_copy, player_2_ship_list_copy):
     game_phase = 2
     player_shoot = ship_input(ship_size, game_phase)
     hit_var = ''
     if player == '1':
         if player_shoot in player_1_miss:
             print("You've already shot here Colonel! Don't waste ammo!")
-            return True
+            return 'skip'
         elif player_shoot in player_2_ship_1:
             player_1_miss.append(player_shoot)
-            print('Precise Hit! Ay Ay Colonel!')
+            print('Precise Hit! You sunk the enemy ship! Ay Ay Colonel!')
             hit_var = 'S'
         elif player_shoot in player_2_ship_2:
-            # ki kell törölni az elemeket mindig és majd ezek utan nézni h hany tagja van és ha 0 akkor legyenek a H-k S ek, és utana win check
             player_1_miss.append(player_shoot)
-            print('Precise Hit! Ay Ay Colonel!')
-            hit_var = 'H'
+            if len(player_2_ship_2) != 0:
+                player_2_ship_2.remove(player_shoot)
+                player_2_ship_list_copy.append(player_shoot)
+                print('Precise Hit! Ay Ay Colonel!\n')
+                hit_var = 'H'
+                if len(player_2_ship_2) == 0:    
+                    print('Precise Hit! You sunk the enemy ship! Ay Ay Colonel!')
+                    hit_var = 'S'
+                    for i in player_2_ship_list_copy:
+                        board1_shadow[i[0]][i[1]] = hit_var
+                    return True
         else:
             player_1_miss.append(player_shoot)
             print("You've missed it Colonel!")
@@ -265,15 +281,24 @@ def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, p
     elif player == '2':
         if player_shoot in player_2_miss:
             print("You've already shot here Colonel! Don't waste ammo!")
-            return True
+            return 'skip'
         elif player_shoot in player_1_ship_1:
             player_2_miss.append(player_shoot)
-            print('Precise Hit! Ay Ay Colonel!')
+            print('Precise Hit! You sunk the enemy ship! Ay Ay Colonel!')
             hit_var = 'S'
         elif player_shoot in player_1_ship_2:
             player_2_miss.append(player_shoot)
-            print('Precise Hit! Ay Ay Colonel!')
-            hit_var = 'H'
+            if len(player_1_ship_2) != 0:
+                player_1_ship_2.remove(player_shoot)
+                player_1_ship_list_copy.append(player_shoot)
+                print('Precise Hit! Ay Ay Colonel!\n')
+                hit_var = 'H'
+                if len(player_1_ship_2) == 0:    
+                    print('Precise Hit! You sunk the enemy ship! Ay Ay Colonel!')
+                    hit_var = 'S'
+                    for i in player_1_ship_list_copy:
+                        board1_shadow[i[0]][i[1]] = hit_var
+                    return True
         else:
             player_2_miss.append(player_shoot)
             print("You've missed it Colonel!")
@@ -304,24 +329,28 @@ def double_board_print_logic(board1, board2, board_size):
 
 
 def main():
-    # intro()
-    # animated_logo_print()
-    board_size = valid_board_size_input()
-    board1 = init_board(board_size)
-    board2 = init_board(board_size)
-    double_board_print_logic(board1, board2, board_size)
-    print("Player 1 Board: \n")
-    player_1_ship_list = ship_placement(board1, board_size)
-    # os.system('cls' if os.name == 'nt' else 'clear')
-    print("Player 2 Board: \n")
-    player_2_ship_list = ship_placement(board2, board_size)
-    # os.system('cls' if os.name == 'nt' else 'clear')
-    print(f"{'':>13}Let the game begin!")
-    global board1_shadow
-    board1_shadow = init_board(board_size)
-    global board2_shadow
-    board2_shadow = init_board(board_size)
-    battleship_game_player_rotation(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase=1, ship_size=1)
+    intro()
+    animated_logo_print()
+    new_game_check = True
+    while new_game_check:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        board_size = valid_board_size_input()
+        board1 = init_board(board_size)
+        board2 = init_board(board_size)
+        double_board_print_logic(board1, board2, board_size)
+        print("Player 1 Board: \n")
+        player_1_ship_list = ship_placement(board1, board_size)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print("Player 2 Board: \n")
+        player_2_ship_list = ship_placement(board2, board_size)
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"{'':>13}Let the game begin!\n")
+        global board1_shadow
+        board1_shadow = init_board(board_size)
+        global board2_shadow
+        board2_shadow = init_board(board_size)
+        battleship_game_player_rotation(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase=1, ship_size=1)
+        new_game_check = new_game()
 
 
 if __name__ == "__main__":
