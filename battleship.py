@@ -14,7 +14,7 @@ sys.stdout.write("\x1b[8;{rows};{cols}t".format(rows=800, cols=800))
 def intro():
     print("Loading:")
 
-    animation = ["[■□□□□□□□□□]","[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
+    animation = ["[■□□□□□□□□□]", "[■■□□□□□□□□]", "[■■■□□□□□□□]", "[■■■■□□□□□□]", "[■■■■■□□□□□]", "[■■■■■■□□□□]", "[■■■■■■■□□□]", "[■■■■■■■■□□]", "[■■■■■■■■■□]", "[■■■■■■■■■■]"]
 
     for i in range(len(animation)):
         time.sleep(0.4)
@@ -53,12 +53,12 @@ def get_coord_input(ship_size):
         size_two_ship_coord = list(input("Please select a starting coordinate for your medium(2) ship (for example A1): \n").upper())
         check_quit(''.join(size_two_ship_coord))
         return size_two_ship_coord
-        
+
 
 def get_shoot_coord_input():
-        shoot_enemy_coord = list(input("Please select a coordinate to shoot your enemy(for example A1): \n").upper())
-        check_quit(''.join(shoot_enemy_coord))
-        return shoot_enemy_coord
+    shoot_enemy_coord = list(input("Please select a coordinate to shoot your enemy(for example A1): \n").upper())
+    check_quit(''.join(shoot_enemy_coord))
+    return shoot_enemy_coord
 
 
 def ship_input(ship_size, game_phase):
@@ -67,15 +67,19 @@ def ship_input(ship_size, game_phase):
     good_cords_number = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     good_cords_number_string = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
     while input_checker is False:
-        if game_phase == 1:
-            full_input = get_coord_input(ship_size)
-            row, col = valid_input_checker(full_input, good_cords_letter, good_cords_number_string, good_cords_number)   
-            return row, col 
-        elif game_phase == 2:
-            full_input = get_shoot_coord_input()
-            row, col = valid_input_checker(full_input, good_cords_letter, good_cords_number_string, good_cords_number)   
-            return row, col      
-                
+        try:
+            if game_phase == 1:
+                full_input = get_coord_input(ship_size)
+                row, col = valid_input_checker(full_input, good_cords_letter, good_cords_number_string, good_cords_number)
+                return row, col
+            elif game_phase == 2:
+                full_input = get_shoot_coord_input()
+                row, col = valid_input_checker(full_input, good_cords_letter, good_cords_number_string, good_cords_number)
+                return row, col
+        except ZeroDivisionError:
+            print("Wrong coordinates!")
+            input_checker = False
+
 
 def valid_input_checker(full_input, good_cords_letter, good_cords_number_string, good_cords_number):
     check_quit(''.join(full_input))
@@ -93,17 +97,13 @@ def valid_input_checker(full_input, good_cords_letter, good_cords_number_string,
                             row = v
                             return row, col
                 else:
-                    print("Wrong coordinates!")
-                    input_checker = False
+                    raise ZeroDivisionError
             else:
-                print("Wrong coordinates!")
-                input_checker = False
+                raise ZeroDivisionError
         else:
-            print("Wrong coordinates!")
-            input_checker = False
+            raise ZeroDivisionError
     else:
-        print("Wrong coordinates!")
-        input_checker = False
+        raise ZeroDivisionError
 
 
 def valid_board_size_input():
@@ -164,7 +164,7 @@ def print_board(board, board_size):
         line = line[0:-1]
         print_var += line + "\n"
     return print_var
-    
+
 
 def mark_ship_1(board, board_size, size_one_ship_coordinates):
     row = size_one_ship_coordinates[0]
@@ -182,8 +182,7 @@ def mark_ship_2(board, board_size, size_two_ship_full_coordinates):
         board[row_start][col_start] = 'X'
     if board[row_end][col_end] == '0':
         board[row_end][col_end] = 'X'
-    
-    
+
 
 def ship_placement(board, board_size):
     player_ship_list = []
@@ -204,7 +203,7 @@ def ship_placement(board, board_size):
     print()
     print(placement_board_p_1)
     return player_ship_list
-    
+
 
 def battleship_game(board1, board2, board_size, player_1_ship_list, player_2_ship_list, game_phase, ship_size):
     player = '1'
@@ -213,43 +212,59 @@ def battleship_game(board1, board2, board_size, player_1_ship_list, player_2_shi
     win_checker = True
     while win_checker is True:
         if player == '1':
-            player_1_hit_checker = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player)
+            reset = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss)
             double_board_print_logic(board1, board2, board_size)
-            player = '1' if player == '2' else '2'
-            player_1_miss.append(player_1_hit_checker)
+            if reset:
+                win_checker = True
+            else:
+                player = '1' if player == '2' else '2'
         elif player == '2':
-            player_2_hit_checker = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player)
+            reset = hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss)
             double_board_print_logic(board1, board2, board_size)
-            player = '1' if player == '2' else '2'
-            player_2_miss.append(player_2_hit_checker)
+            if reset:
+                win_checker = True
+            else:
+                player = '1' if player == '2' else '2'
 
 
-def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player):
+def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss):
+    player_2_ship_list_no_touple = [item for i, item in enumerate(player_2_ship_list) if i == 0]
+    for item in player_2_ship_list[1]:
+        player_2_ship_list_no_touple.append(item)
+    print(player_1_ship_list)
+    player_1_ship_list_no_touple = [item for i, item in enumerate(player_1_ship_list) if i == 0]
+    for item in player_1_ship_list[1]:
+        player_1_ship_list_no_touple.append(item)
+    print(player_1_ship_list_no_touple)
     game_phase = 2
     player_shoot = ship_input(ship_size, game_phase)
-    player_miss_coords = []
     hit_var = ''
     if player == '1':
-        if player_shoot in player_2_ship_list:
+        if player_shoot in player_1_miss:
+            print("You've already shot here Colonel! Don't waste ammo!")
+            return True
+        elif player_shoot in player_2_ship_list_no_touple:
+            player_1_miss.append(player_shoot)
             print('Precise Hit! Ay Ay Colonel!')
-            player_2_ship_list.remove(player_shoot)
-            hit_var = 'X'
+            hit_var = 'H'
         else:
-            player_miss_coords.append(player_shoot)
+            player_1_miss.append(player_shoot)
             print("You've missed it Colonel!")
             hit_var = 'M'
         board2_shadow[player_shoot[0]][player_shoot[1]] = hit_var
     elif player == '2':
-        if player_shoot in player_1_ship_list:
+        if player_shoot in player_2_miss:
+            print("You've already shot here Colonel! Don't waste ammo!")
+            return True
+        elif player_shoot in player_1_ship_list_no_touple:
+            player_2_miss.append(player_shoot)
             print('Precise Hit! Ay Ay Colonel!')
-            player_1_ship_list.remove(player_shoot)
-            hit_var = 'X'
+            hit_var = 'H'
         else:
-            player_miss_coords.append(player_shoot)
+            player_2_miss.append(player_shoot)
             print("You've missed it Colonel!")
             hit_var = 'M'
         board1_shadow[player_shoot[0]][player_shoot[1]] = hit_var
-    return player_miss_coords
 
 
 def get_player_boards(player, board, board_size):
@@ -257,7 +272,7 @@ def get_player_boards(player, board, board_size):
     if player == "1":
         print_var = print_board(board, board_size)
     if player == "2":
-        print_var = print_board(board, board_size) 
+        print_var = print_board(board, board_size)
     return print_var
 
 
@@ -283,16 +298,16 @@ def main():
     double_board_print_logic(board1, board2, board_size)
     print("Player 1 Board: \n")
     player_1_ship_list = ship_placement(board1, board_size)
-    #os.system('cls' if os.name == 'nt' else 'clear')
+    # os.system('cls' if os.name == 'nt' else 'clear')
     print("Player 2 Board: \n")
     player_2_ship_list = ship_placement(board2, board_size)
-    #os.system('cls' if os.name == 'nt' else 'clear')
+    # os.system('cls' if os.name == 'nt' else 'clear')
     print(f"{'':>13}Let the game begin!")
     global board1_shadow
     board1_shadow = init_board(board_size)
-    global board2_shadow 
-    board2_shadow= init_board(board_size)
-    battleship_game(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase = 1, ship_size = 1)
+    global board2_shadow
+    board2_shadow = init_board(board_size)
+    battleship_game(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase=1, ship_size=1)
 
 
 if __name__ == "__main__":
