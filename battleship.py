@@ -205,7 +205,7 @@ def ship_placement(board, board_size):
     return player_ship_list
 
 
-def battleship_game(board1, board2, board_size, player_1_ship_list, player_2_ship_list, game_phase, ship_size):
+def battleship_game_player_rotation(board1, board2, board_size, player_1_ship_list, player_2_ship_list, game_phase, ship_size):
     player = '1'
     player_1_miss = []
     player_2_miss = []
@@ -227,15 +227,20 @@ def battleship_game(board1, board2, board_size, player_1_ship_list, player_2_shi
                 player = '1' if player == '2' else '2'
 
 
-def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss):
-    player_2_ship_list_no_touple = [item for i, item in enumerate(player_2_ship_list) if i == 0]
+def all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list):
+    player_2_ship_2 = []
+    player_2_ship_1 = [item for i, item in enumerate(player_2_ship_list) if i == 0]
     for item in player_2_ship_list[1]:
-        player_2_ship_list_no_touple.append(item)
-    print(player_1_ship_list)
-    player_1_ship_list_no_touple = [item for i, item in enumerate(player_1_ship_list) if i == 0]
+        player_2_ship_2.append(item)
+    player_1_ship_2 = []
+    player_1_ship_1 = [item for i, item in enumerate(player_1_ship_list) if i == 0]
     for item in player_1_ship_list[1]:
-        player_1_ship_list_no_touple.append(item)
-    print(player_1_ship_list_no_touple)
+        player_1_ship_2.append(item)
+    return player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2
+
+
+def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, player, player_1_miss, player_2_miss):
+    player_1_ship_1, player_1_ship_2, player_2_ship_1, player_2_ship_2 = all_ship_coordiane_lists(player_1_ship_list, player_2_ship_list)
     game_phase = 2
     player_shoot = ship_input(ship_size, game_phase)
     hit_var = ''
@@ -243,7 +248,12 @@ def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, p
         if player_shoot in player_1_miss:
             print("You've already shot here Colonel! Don't waste ammo!")
             return True
-        elif player_shoot in player_2_ship_list_no_touple:
+        elif player_shoot in player_2_ship_1:
+            player_1_miss.append(player_shoot)
+            print('Precise Hit! Ay Ay Colonel!')
+            hit_var = 'S'
+        elif player_shoot in player_2_ship_2:
+            # ki kell törölni az elemeket mindig és majd ezek utan nézni h hany tagja van és ha 0 akkor legyenek a H-k S ek
             player_1_miss.append(player_shoot)
             print('Precise Hit! Ay Ay Colonel!')
             hit_var = 'H'
@@ -256,7 +266,11 @@ def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, p
         if player_shoot in player_2_miss:
             print("You've already shot here Colonel! Don't waste ammo!")
             return True
-        elif player_shoot in player_1_ship_list_no_touple:
+        elif player_shoot in player_1_ship_1:
+            player_2_miss.append(player_shoot)
+            print('Precise Hit! Ay Ay Colonel!')
+            hit_var = 'S'
+        elif player_shoot in player_1_ship_2:
             player_2_miss.append(player_shoot)
             print('Precise Hit! Ay Ay Colonel!')
             hit_var = 'H'
@@ -307,7 +321,7 @@ def main():
     board1_shadow = init_board(board_size)
     global board2_shadow
     board2_shadow = init_board(board_size)
-    battleship_game(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase=1, ship_size=1)
+    battleship_game_player_rotation(board1_shadow, board2_shadow, board_size, player_1_ship_list, player_2_ship_list, game_phase=1, ship_size=1)
 
 
 if __name__ == "__main__":
