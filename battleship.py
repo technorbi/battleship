@@ -253,7 +253,7 @@ def hit_checker(player_1_ship_list, player_2_ship_list, game_phase, ship_size, p
             print('Precise Hit! Ay Ay Colonel!')
             hit_var = 'S'
         elif player_shoot in player_2_ship_2:
-            # ki kell törölni az elemeket mindig és majd ezek utan nézni h hany tagja van és ha 0 akkor legyenek a H-k S ek
+            # ki kell törölni az elemeket mindig és majd ezek utan nézni h hany tagja van és ha 0 akkor legyenek a H-k S ek, és utana win check
             player_1_miss.append(player_shoot)
             print('Precise Hit! Ay Ay Colonel!')
             hit_var = 'H'
