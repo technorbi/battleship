@@ -220,6 +220,7 @@ def battleship_game_player_rotation(board1, board2, board_size, player_1_ship_li
             os.system('cls' if os.name == 'nt' else 'clear')
         double_board_print_logic(board1, board2, board_size)
         if reset == True:
+            print(f'Congratulations, palyer {player} has won! \n')
             win_checker = False
         elif reset == 'skip':
             win_checker = True
